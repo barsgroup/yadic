@@ -21,7 +21,7 @@ def test_flat_merge():
     }
 
 
-def test_dee_merge():
+def test_deep_merge():
     """Tests the deep_merge"""
 
     d1 = {
@@ -76,4 +76,21 @@ def test_dee_merge():
         'junk': {
             'vine glass': 15
         }
+    }
+
+
+def test_merge_of_dicts_with_prefixed_keys():
+    d1 = {
+        'a': 1,
+        '$b': 2,
+        'c': 3
+    }
+    d2 = {
+        '$a': 10,
+        'b': 20
+    }
+    assert merge(d1, d2, lambda x, y, m, p: y) == {
+        '$a': 10,
+        'b': 20,
+        'c': 3
     }

@@ -6,6 +6,7 @@ def merge(d1, d2, fn, path=tuple()):
     """
     Updates the dict "d1" with elems of the dict "d2",
     and returns the dict "d1".
+    Keys like 'a' and '$a' will be considered equal!
     Collisions will be resolved using the function "fn",
     which takes:
     - both of values
@@ -17,11 +18,22 @@ def merge(d1, d2, fn, path=tuple()):
         raise TypeError("Only dicts can be merged!")
     for k, v in d2.items():
         try:
-            old_v = d1[k]
-        except KeyError:
-            d1[k] = v
+            if k.startswith('$'):
+                variants = (k, k[1:])
+            else:
+                variants = ('$' + k, k)
+        except AttributeError:
+            variants = (k,)
+        for key in variants:
+            try:
+                old_v = d1.pop(key)
+            except KeyError:
+                continue
+            else:
+                d1[k] = fn(old_v, v, fn, path + (k,))
+                break
         else:
-            d1[k] = fn(old_v, v, fn, path + (k,))
+            d1[k] = v
     return d1
 
 
